@@ -1,4 +1,5 @@
 import express from 'express';
+import { validateIssue } from '../middleware/validation.js';
 import { authenticate } from '../middleware/auth.js';
 import {
   getAllIssues,
@@ -21,8 +22,8 @@ router.get('/dashboard', getDashboardStats);
 // CRUD routes for issues
 router.get('/issues', getAllIssues);
 router.get('/issues/:id', getIssueById);
-router.post('/issues', createIssue);
-router.put('/issues/:id', updateIssue);
+router.post('/issues', validateIssue, createIssue);
+router.put('/issues/:id', validateIssue, updateIssue);
 router.delete('/issues/:id', deleteIssue);
 
 // Quick resolve
