@@ -6,7 +6,10 @@
   "type": "module",
   "scripts": {
     "start": "node src/index.js",
-    "dev": "node --watch src/index.js"
+    "dev": "node --watch src/index.js",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage"
   },
   "keywords": ["clinical-trial", "issue-tracker"],
   "author": "",
@@ -16,5 +19,9 @@
     "mysql2": "^3.6.5",
     "cors": "^2.8.5",
     "multer": "^1.4.5-lts.1"
+  },
+  "devDependencies": {
+    "vitest": "^1.0.4",
+    "@vitest/ui": "^1.0.4"
   }
 }
