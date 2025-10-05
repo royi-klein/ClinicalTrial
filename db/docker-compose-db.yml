@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: trial-issues-db
+    environment:
+      MYSQL_ROOT_PASSWORD: royis_secret
+      MYSQL_DATABASE: trial_issues
+      MYSQL_USER: us
+      MYSQL_PASSWORD: pass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./schema.sql:/docker-entrypoint-initdb.d/01-schema.sql  # Auto-run SQL on first start
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - trial-network
+
+volumes:
+  mysql_data:
+
+networks:
+  trial-network:
+    driver: bridge

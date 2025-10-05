@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: trial-issues-server
+    environment:
+      DB_HOST: trial-issues-db    # Connect to your existing DB container
+      DB_USER: us
+      DB_PASSWORD: pass
+      DB_NAME: trial_issues
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./src:/app/src            # Mount source for live reload
+      - ./package.json:/app/package.json
+    networks:
+      - db_trial-network          # Use DB's network (created by docker-compose-db.yml)
+    restart: unless-stopped
+
+networks:
+  db_trial-network:
+    external: true                # Use the existing network from DB

@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  # MySQL Database
+  db:
+    image: mysql:8.0
+    container_name: trial-issues-db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: trial_issues
+      MYSQL_USER: us
+      MYSQL_PASSWORD: pass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./db/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - trial-network
+    restart: unless-stopped
+
+  # Node.js Backend Server
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: trial-issues-backend
+    environment:
+      DB_HOST: db                 # Service name in docker-compose
+      DB_USER: us
+      DB_PASSWORD: pass
+      DB_NAME: trial_issues
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./server/src:/app/src     # Live reload during development
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - trial-network
+    restart: unless-stopped
+
+  # React Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: trial-issues-frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend/src:/app/src   # Live reload during development
+    depends_on:
+      - backend
+    networks:
+      - trial-network
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
+
+networks:
+  trial-network:
+    driver: bridge
